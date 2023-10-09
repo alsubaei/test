@@ -61,16 +61,32 @@ class PostController extends Controller
                 'title' => $post->title,
                 'image' => $post->image,
                 'content' => $post->content,
+                'user' => $post->user,
             ]);
+        } else
+        {
+            return response()->json([
+                'message'=> 'post not created'
+            ],404);
         }
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Post $post)
+    public function show($id)
     {
-        //
+        $post = Post::find($id);
+        if(!empty($post))
+        {
+            return response()->json($post);
+        }
+        else
+        {
+            return response()->json([
+                'message'=> 'post not found'
+            ],404);
+        }
     }
 
     /**
@@ -100,8 +116,17 @@ class PostController extends Controller
         if ($post) {
             return response()->json([
                 'id' => $post->id,
-                'name' => $post->state_name,
+                'title' => $post->title,
+                'image' => $post->image,
+                'content' => $post->content,
+                'user' => $post->user,
             ]);
+        }
+        else
+        {
+            return response()->json([
+                'message'=> 'post not updated'
+            ],404);
         }
     }
 
@@ -119,6 +144,11 @@ class PostController extends Controller
             return response()->json([
                 'id' => $post_id,
             ]);
+        } else
+        {
+            return response()->json([
+                'message'=> 'post not deleted'
+            ],404);
         }
     }
 }
