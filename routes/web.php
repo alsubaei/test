@@ -29,18 +29,17 @@ Route::middleware([
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');
-
+});
+// Route::middleware('auth')->group(function () {
     Route::get('/permission', [PermissionController::class, 'permissionAction'])->name(
         'permission.all'
     );
     Route::group(['prefix' => 'post'], function () {
         Route::get('/', [PostController::class, 'index'])->name('posts.index');
-        Route::get('/create', [PostController::class, 'create'])->name('posts.create');
         Route::post('/', [PostController::class, 'store'])->name('posts.store');
-        Route::get('/{Post}', [PostController::class, 'show'])->name('posts.show');
-        Route::get('/{Post}/edit', [PostController::class, 'edit'])->name('posts.edit');
-        Route::put('/{Post}', [PostController::class, 'update'])->name('posts.update');
-        Route::delete('/{Post}', [PostController::class, 'destroy'])->name(
+        Route::get('/{post}', [PostController::class, 'show'])->name('posts.show');
+        Route::put('/{post}', [PostController::class, 'update'])->name('posts.update');
+        Route::post('/{post}', [PostController::class, 'destroy'])->name(
             'posts.destroy'
         );
     });
@@ -67,4 +66,4 @@ Route::middleware([
             'users.destroy'
         );
     });
-});
+// });

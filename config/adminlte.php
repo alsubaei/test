@@ -326,17 +326,17 @@ return [
                     'text' => 'Permissions',
                     'route' => 'permission.all',
                     'can' => 'Super Admin',
-                    ],
+                ],
                 [
                     'text' => 'Roles',
                     'route' => 'roles.index',
                     'can' => 'Super Admin',
-                    ],
+                ],
                 [
                     'text' => 'Users',
                     'route' => 'users.index',
                     'can' => 'Super Admin',
-                    ],
+                ],
             ],
         ],
         [
@@ -511,26 +511,35 @@ return [
                 ],
             ],
         ],
-          'Select2' => [
-        'active' => false,
-        'files' => [
-            [
-                'type' => 'js',
-                'asset' => true,
-                'location' => 'vendor/select2/js/select2.full.min.js',
+        'Select2' => [
+            'active' => false,
+            'files' => [
+                [
+                    'type' => 'js',
+                    'asset' => true,
+                    'location' => 'vendor/select2/js/select2.full.min.js',
+                ],
+                [
+                    'type' => 'css',
+                    'asset' => true,
+                    'location' => 'vendor/select2/css/select2.min.css',
+                ],
+                [
+                    'type' => 'css',
+                    'asset' => true,
+                    'location' => 'vendor/select2-bootstrap4-theme/select2-bootstrap4.min.css',
+                ],
             ],
-            [
-                'type' => 'css',
-                'asset' => true,
-                'location' => 'vendor/select2/css/select2.min.css',
-            ],
-            [
-                'type' => 'css',
-                'asset' => true,
-                'location' => 'vendor/select2-bootstrap4-theme/select2-bootstrap4.min.css',
+        ], 'BsCustomFileInput' => [
+            'active' => false,
+            'files' => [
+                [
+                    'type' => 'js',
+                    'asset' => true,
+                    'location' => 'vendor/bs-custom-file-input/bs-custom-file-input.min.js',
+                ],
             ],
         ],
-    ],
         // 'Select2' => [
         //     'active' => true,
         //     'files' => [

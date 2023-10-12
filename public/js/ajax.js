@@ -1,82 +1,129 @@
 $(function () {
-    //----- Open model of status -----//
-    $(document).on('click', '.btn-open-status', function () {
+    //----- Open model of posts with its data if it's update btn-----//
+    $(document).on('click', '.btn-open-post', function () {
+        $('#error_list').empty();
         if ($('input:hidden[post_id]'))
             $('input:hidden[post_id]').remove();
-        $('#btn-save-status').attr('id', "btn-status");
-        $('#btn-edit-status').attr('id', "btn-status");
-        $('#title').val("");
-        $('#image').val("");
-        $('#content').val("");
+        $('#img').css("display", "none");
+        $('#form')[0].reset();
         $('#error').hide();
-        $('ul li').remove();
+        $('#btn-save-post').attr('id', "btn-post");
+        $('#btn-edit-post').attr('id', "btn-post");
+        $('#formModal').modal('show');
+        //the create button
         if ($(this).val() == 'add')
-            $('#btn-status').attr('id', "btn-save-status");
+            $('#btn-post').attr('id', "btn-save-post");
         else {
-            $('#btn-status').attr('id', "btn-edit-status");
-            $title = $('#post' + $(this).attr('post_id') + '> td').each(function (index) {
-                if (index != 4) {
+            //the edit button
+            $('#img').css("display", "block");
+            $('textarea').text("");
+            //the array contains posts values
+            values = [];
+            $('#post' + $(this).attr('post_id') + '> td').each(function (index) {
+                if (index != 5) {
                     values[index] = $(this).html().trim();
+                } if (index == 1) {
+                    values[index] = $(this).find('img').attr('src');
                 }
             });
+            // console.log("the values in td in row that will update:\n", values);
+            //the array contains posts keys
             keys = [];
             $('#formModal :input').each(function () {
                 if ($(this).prop('name') != '')
                     keys.push($(this).prop('name'));
             });
+            // console.log("the names in td in row that will update:\n", keys);
+
+            // put the values in the keys in formModal
+            $.each(values, function (index) {
+                if (keys[index] == 'image') {
+                    if (values[index]) {
+                        $('#img').attr("src", values[index]);
+                        $('#img').attr("alt", 'image');
+                    }
+                } else if (keys[index] == 'content') {
+                    $('textarea').text(values[index]);
+                }
+                else {
+                    $('input[name="' + keys[index] + '"]').val(values[index]);
+                }
+            });
+            // determine the btn if edit
+            if ($(this).val() == 'edit') {
+                $('#btn-post').attr('id', "btn-edit-post");
+            }
+            $('#formModal').append('<input type="hidden" post_id="' + $(this).attr("post_id") + '" />');
         }
-        $('#formModal').append('<input type="hidden" post_id="' + $(this).attr("post_id") + '" />');
-        $('#formModal').modal('show');
     });
 
-    // CREATE of status
-    $(document).on('click', '#btn-save-status', function (e) {
+    //add the post
+    // CREATE of purchaseRequest posts
+    $(document).on('click', '#btn-save-post', function (e) {
         $.ajaxSetup({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }
         });
         e.preventDefault();
-        var data = new FormData();
-        data.append('createStatusName', $('#StatusName').val());
+
+        var formData = new FormData();
+        formData.append('title', $('#title').val());
+        formData.append("image", $('#attachment').prop("files")[0]);
+        formData.append('content', $('#content').val());
+        formData.append('user', $('#user').val());
         $.ajax({
-            type: 'post',
-            url: '/Post',
-            data: data,
+            url: 'post/',
+            method: 'POST',
+            enctype: 'multipart/form-data',
+            data: formData,
             dataType: 'json',
             contentType: false,
             processData: false,
             success: function (result) {
-                $('#error').hide();
                 $('#formModal').modal('hide');
-                $("#post-list").append('<tr id="status' + result.id + '"><td>' + result.title + '</td><td>' + result.image + '</td><td>' + result.content + '</td><td><button data-toggle="modal" status_id="' + result.id + '" class= "btn-open-status btn btn-xs btn-default text-primary mx-1 shadow" title="Edit"> <i class="fa fa-lg fa-fw fa-pen"></i> </button> <button status_id="' + result.id + '" class="btn btn-xs btn-default text-danger mx-1 shadow btn-delete-status" title = "Delete"><i class="fa fa-lg fa-fw fa-trash"></i></button></td></tr>'
-                );
-            }, error: function (reject) {
-                $('ul li').remove();
+                $('#form')[0].reset();
+                $('#error_list').empty();
+                $('#error').hide();
+                if ($('input:hidden[post_id]'))
+                    $('input:hidden[post_id]').remove();
+                $('#img').css("display", "none");
+                $("#post-list").prepend('<tr id="post' + result.id + '"><td>' + result.title + '</td><td><img src="'+ result.image +'" alt="img" width="100" height="100"></td><td>' + result.content + '</td><td>' + result.user + '</td><td><button data-toggle="modal" post_id="' + result.id + '" class= "btn-open-post btn btn-xs btn-default text-primary mx-1 shadow" title = "Edit" > <i class="fa fa-lg fa-fw fa-pen"></i> </button> <button post_id="' + result.id + '" class="btn btn-xs btn-default text-danger mx-1 shadow btn-delete-post" title = "Delete"><i class="fa fa-lg fa-fw fa-trash"></i></button></td ></tr > ');
+            },
+            error: function (reject) {
+                $('#error_list').empty();
                 var response = JSON.parse(reject.responseText);
                 if (response.errors) {
                     $('#error').show();
+
                     $.each(response.errors, function (key, value) {
                         $('#error_list').append('<li>' + value[0] + '</li>');
                     });
+                }
+                else {
+                    $('#error').show();
+                    $('#error_list').append('<li>' + response.message + '</li>');
+                    console.log(response.message);
                 }
                 console.log(reject);
             }
         });
     });
 
-    // delete of status
-    $(document).on('click', '.btn-delete-status', function (e) {
+    // delete of post
+    $(document).on('click', '.btn-delete-post', function (e) {
+        console.log($(this).attr('post_id'))
         e.preventDefault();
         $.ajax({
             type: 'post',
-            url: "Post/" + $(this).attr('post_id'),
+            url: "post/" + $(this).attr('post_id'),
             data: {
                 '_token': $('meta[name="csrf-token"]').attr('content'),
                 'id': $(this).attr('post_id'),
             },
             dataType: 'json',
             success: function (result) {
+                alert('delete the post');
                 $("#post" + result.id).remove();
 
             }, error: function (reject) {
@@ -86,39 +133,5 @@ $(function () {
 
     });
 
-    // edit of status
-    $(document).on('click', '#btn-edit-status', function (e) {
-        e.preventDefault();
-        $.ajaxSetup({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            }
-        });
-        $.ajax({
-            type: 'post',
-            url: "Status/" + $('#formModal > input').attr('status_id') + "/update",
-            data: {
-                'id': $('#formModal input').attr('status_id'),
-                'editStatusName': $('#StatusName').val(),
-            },
-            dataType: 'json',
-            success: function (result) {
-                $('#error').hide();
-                $('#formModal').modal('hide');
-                $('#status' + result.id + " > td:nth-child(1)").text(result.name);
-            }, error: function (reject) {
-                $('ul li').remove();
-                var response = JSON.parse(reject.responseText);
-                if (response.errors) {
-                    $('#error').show();
-                    $.each(response.errors, function (key, value) {
-                        $('#error_list').append('<li>' + value[0] + '</li>');
-                    });
-                }
-                console.log(reject);
-            }
-        });
-
-    });
 });
 
