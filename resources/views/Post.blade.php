@@ -16,7 +16,7 @@
     </ul>
 </div>
 @endif
-<x-adminlte-modal id="formModal" title="Add Your Post" size="lg" theme="dark" icon="fas fa-info" v-centered
+<x-adminlte-modal id="formModal" title="Your Post" size="lg" theme="dark" icon="fas fa-info" v-centered
         static-backdrop>
         <div id="error" class="alert alert-danger">
             <ul id="error_list">
@@ -36,7 +36,7 @@
                 </x-adminlte-input-file>
                     <img id="img" name="attachment" src="" width="100" height="100">
             </div>     
-            <x-adminlte-textarea name="content" placeholder="Insert description..." label='Content'/>
+            <x-adminlte-textarea name="content" id='content' placeholder="Insert description..." label='Content'/>
             <x-adminlte-select value="{{ old('user') }}" name="user" id="user" label="User"
             igroup-size="lg">
             @foreach (App\Models\User::all() as $user)
@@ -69,11 +69,14 @@
             @foreach ($posts as $post)
                 <tr id="post{{ $post->id }}">
                     <td>{{ $post->title }}</td>
-                    <td><img src="{{ $post->image}}" alt="img" width="100" height="100"></td>
+                    @if(str_contains($post->image, 'http'))
+                    <td><img src="{{ $post->image}}" alt="{{ $post->image}}" width="100" height="100"></td>
+                    @else
+                    <td><img src="attachment/{{ $post->image}}" alt="{{ $post->image}}" width="100" height="100"></td>
+                    @endif
                     <td>{{ $post->content }}</td>
                     <td>{{ $post::find($post->id)->user->name  }}</td>
                     <td>
-                        
                         <button data-toggle="modal" post_id="{{ $post->id }}"
                             data-target="#formModal" class="btn-open-post btn btn-xs btn-default text-primary mx-1 shadow" title="Edit"
                             value="edit">

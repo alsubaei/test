@@ -29,9 +29,7 @@ Route::middleware([
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');
-});
-// Route::middleware('auth')->group(function () {
-    Route::get('/permission', [PermissionController::class, 'permissionAction'])->name(
+Route::get('/permission', [PermissionController::class, 'permissionAction'])->name(
         'permission.all'
     );
     Route::group(['prefix' => 'post'], function () {
@@ -66,4 +64,4 @@ Route::middleware([
             'users.destroy'
         );
     });
-// });
+});

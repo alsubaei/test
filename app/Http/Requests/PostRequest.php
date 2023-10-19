@@ -11,7 +11,7 @@ class PostRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -23,7 +23,7 @@ class PostRequest extends FormRequest
     {
         return [
             'title' => 'required:posts,title',
-            'image' => 'required:posts,image',
+            'image' => 'required|mimes:png',
             'content' => 'required:posts,content',
             
         ];
@@ -33,6 +33,7 @@ class PostRequest extends FormRequest
         return [
             'title.required' => 'Enter the post title',
             'image.required' => 'Enter the post image',
+            'image.mimes' => 'Must the file by image',
             'content.required' => 'Enter the content',
             ];
     }

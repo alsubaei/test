@@ -58,7 +58,6 @@ $(function () {
     });
 
     //add the post
-    // CREATE of purchaseRequest posts
     $(document).on('click', '#btn-save-post', function (e) {
         $.ajaxSetup({
             headers: {
@@ -66,15 +65,14 @@ $(function () {
             }
         });
         e.preventDefault();
-
         var formData = new FormData();
         formData.append('title', $('#title').val());
         formData.append("image", $('#attachment').prop("files")[0]);
         formData.append('content', $('#content').val());
         formData.append('user', $('#user').val());
         $.ajax({
+            type: 'POST',
             url: 'post/',
-            method: 'POST',
             enctype: 'multipart/form-data',
             data: formData,
             dataType: 'json',
@@ -82,13 +80,14 @@ $(function () {
             processData: false,
             success: function (result) {
                 $('#formModal').modal('hide');
+                $('.modal-backdrop').remove();
                 $('#form')[0].reset();
                 $('#error_list').empty();
                 $('#error').hide();
                 if ($('input:hidden[post_id]'))
                     $('input:hidden[post_id]').remove();
                 $('#img').css("display", "none");
-                $("#post-list").prepend('<tr id="post' + result.id + '"><td>' + result.title + '</td><td><img src="'+ result.image +'" alt="img" width="100" height="100"></td><td>' + result.content + '</td><td>' + result.user + '</td><td><button data-toggle="modal" post_id="' + result.id + '" class= "btn-open-post btn btn-xs btn-default text-primary mx-1 shadow" title = "Edit" > <i class="fa fa-lg fa-fw fa-pen"></i> </button> <button post_id="' + result.id + '" class="btn btn-xs btn-default text-danger mx-1 shadow btn-delete-post" title = "Delete"><i class="fa fa-lg fa-fw fa-trash"></i></button></td ></tr > ');
+                $("#post-list").prepend('<tr id="post' + result.id + '"><td>' + result.title + '</td><td><img src="attachment/' + result.image + '" alt="img" width="100" height="100"></td><td>' + result.content + '</td><td>' + result.user + '</td><td><button data-toggle="modal" post_id="' + result.id + '" class= "btn-open-post btn btn-xs btn-default text-primary mx-1 shadow" title = "Edit" > <i class="fa fa-lg fa-fw fa-pen"></i> </button> <button post_id="' + result.id + '" class="btn btn-xs btn-default text-danger mx-1 shadow btn-delete-post" title = "Delete"><i class="fa fa-lg fa-fw fa-trash"></i></button></td ></tr > ');
             },
             error: function (reject) {
                 $('#error_list').empty();
@@ -109,6 +108,66 @@ $(function () {
             }
         });
     });
+
+    // edit the post
+    $(document).on('click', '#btn-edit-post', function (e) {
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+        e.preventDefault();
+        var formData = new FormData();
+        formData.append('title', $('#title').val());
+        formData.append('content', $('#content').val());
+        if (typeof $('#attachment').prop("files")[0] == 'undefined')
+            formData.append("image", $('#img').attr('src'));
+        else
+            formData.append("image", $('#attachment').prop("files")[0]);
+        formData.append('user', $('#user').val());
+        $.ajax({
+            type: 'put',
+            url: "post/" + $('#formModal > input').attr('post_id'),
+            enctype: 'multipart/form-data',
+            data: formData,
+            dataType: 'json',
+            contentType: false,
+            processData: false,
+            success: function (result) {
+                $('#formModal').modal('hide');
+                $('.modal-backdrop').remove();
+                $('#form')[0].reset();
+                $('#error_list').empty();
+                $('#error').hide();
+                if ($('input:hidden[post_id]'))
+                    $('input:hidden[post_id]').remove();
+                $('#img').css("display", "none");
+                $('#post' + result.id + " > td:nth-child(1)").text(result.title);
+                $('#post' + result.id + " > td:nth-child(2)").text(result.image);
+                $('#post' + result.id + " > td:nth-child(3)").text(result.content);
+                $('#post' + result.id + " > td:nth-child(4)").text(result.user);
+            },
+            error: function (reject) {
+                $('#error_list').empty();
+                var response = JSON.parse(reject.responseText);
+                if (response.errors) {
+                    $('#error').show();
+
+                    $.each(response.errors, function (key, value) {
+                        $('#error_list').append('<li>' + value[0] + '</li>');
+                    });
+                }
+                else {
+                    $('#error').show();
+                    $('#error_list').append('<li>' + response.message + '</li>');
+                    console.log(response.message);
+                }
+                console.log(reject);
+            }
+        });
+
+    });
+
 
     // delete of post
     $(document).on('click', '.btn-delete-post', function (e) {

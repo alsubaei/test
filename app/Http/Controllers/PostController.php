@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use Log;
 use App\Models\Post;
+use App\Traits\Attachment;
 use Illuminate\Http\Request;
 use App\Http\Requests\PostRequest;
 use Illuminate\Support\Facades\Auth;
@@ -10,6 +12,7 @@ use Illuminate\Support\Facades\Validator;
 
 class PostController extends Controller
 {
+    use Attachment;
     /**
      * Display a listing of the resource.
      */
@@ -50,13 +53,14 @@ class PostController extends Controller
         }
     }
 
-    public function update(Request $request, Post $post)
+    public function update(Request $request, int $post_id)
     {
-        $post = Post::find($post->id);
-        if (!$post) {
+        Log::info("request", [$request->all()]);
+        $post = Post::find($post_id);
+        if (!$request) {
             return redirect()->back();
         }
-
+        dd($request->all());
         $post->title = $request->title;
         $post->image = $request->image;
         $post->content = $request->content;
