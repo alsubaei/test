@@ -126,8 +126,8 @@ $(function () {
             formData.append("image", $('#attachment').prop("files")[0]);
         formData.append('user', $('#user').val());
         $.ajax({
-            type: 'put',
-            url: "post/" + $('#formModal > input').attr('post_id'),
+            type: 'post',
+            url: "post/" + $('#formModal > input').attr('post_id') + '/update',
             enctype: 'multipart/form-data',
             data: formData,
             dataType: 'json',
@@ -143,9 +143,12 @@ $(function () {
                     $('input:hidden[post_id]').remove();
                 $('#img').css("display", "none");
                 $('#post' + result.id + " > td:nth-child(1)").text(result.title);
-                $('#post' + result.id + " > td:nth-child(2)").text(result.image);
+                if (result.image.includes('http'))
+                    $('#post' + result.id + " > td:nth-child(2)").html('<img src="' + result.image + '" alt="">');
+                else
+                    $('#post' + result.id + " > td:nth-child(2)").html('<img src="attachment/' + result.image + '" alt="">');
                 $('#post' + result.id + " > td:nth-child(3)").text(result.content);
-                $('#post' + result.id + " > td:nth-child(4)").text(result.user);
+                $('#post' + result.id + " > td:nth-child(4)").text(result.user.name);
             },
             error: function (reject) {
                 $('#error_list').empty();

@@ -36,7 +36,7 @@ Route::get('/permission', [PermissionController::class, 'permissionAction'])->na
         Route::get('/', [PostController::class, 'index'])->name('posts.index');
         Route::post('/', [PostController::class, 'store'])->name('posts.store');
         Route::get('/{post}', [PostController::class, 'show'])->name('posts.show');
-        Route::put('/{post}', [PostController::class, 'update'])->name('posts.update');
+        Route::post('/{post}/update', [PostController::class, 'update'])->name('posts.update');
         Route::post('/{post}', [PostController::class, 'destroy'])->name(
             'posts.destroy'
         );

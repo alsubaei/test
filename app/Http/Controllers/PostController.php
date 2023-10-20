@@ -18,16 +18,18 @@ class PostController extends Controller
      */
     public function index()
     {
-        //edit its posts just
-        $posts = Post::where('user_id',Auth::user()->id);
+        if (Auth::user()->hasRole('Editors'))
+            $posts = Post::all();
+        else  //edit its posts just
+            $posts = Post::where('user_id', Auth::user()->id);
         $posts = $posts->paginate(5);
-        return view('post',['posts'=>$posts]);
+        return view('post', ['posts' => $posts]);
     }
 
-   public function store(PostRequest $request)
+    public function store(PostRequest $request)
     {
         $post = new Post();
-        $post->title = $request->title; 
+        $post->title = $request->title;
         if ($request->hasfile('image')) {
             $post->image = $this->saveFile(
                 $request->file('image'),
@@ -45,22 +47,19 @@ class PostController extends Controller
                 'content' => $post->content,
                 'user' => $post->user->name,
             ]);
-        } else
-        {
+        } else {
             return response()->json([
-                'message'=> 'post not created'
-            ],404);
+                'message' => 'post not created'
+            ], 404);
         }
     }
 
     public function update(Request $request, int $post_id)
     {
-        Log::info("request", [$request->all()]);
         $post = Post::find($post_id);
         if (!$request) {
             return redirect()->back();
         }
-        dd($request->all());
         $post->title = $request->title;
         $post->image = $request->image;
         $post->content = $request->content;
@@ -75,12 +74,10 @@ class PostController extends Controller
                 'content' => $post->content,
                 'user' => $post->user,
             ]);
-        }
-        else
-        {
+        } else {
             return response()->json([
-                'message'=> 'post not updated'
-            ],404);
+                'message' => 'post not updated'
+            ], 404);
         }
     }
 
@@ -89,20 +86,19 @@ class PostController extends Controller
      */
     public function destroy(int $id)
     {
-       $post = Post::find($id);
+        $post = Post::find($id);
         if (!$post) {
             return redirect()->back();
         }
-       $post->delete();
+        $post->delete();
         if ($post) {
             return response()->json([
                 'id' => $id,
             ]);
-        } else
-        {
+        } else {
             return response()->json([
-                'message'=> 'post not deleted'
-            ],404);
+                'message' => 'post not deleted'
+            ], 404);
         }
     }
 }
