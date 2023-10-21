@@ -19,7 +19,7 @@ class PostController extends Controller
     public function index()
     {
         if (Auth::user()->hasRole('Editors'))
-            $posts = Post::all();
+            $posts = Post::select('*');
         else  //edit its posts just
             $posts = Post::where('user_id', Auth::user()->id);
         $posts = $posts->paginate(5);
